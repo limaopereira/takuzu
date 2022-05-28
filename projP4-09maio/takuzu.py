@@ -7,6 +7,9 @@
 # 00000 Nome2
 
 import sys
+import numpy
+
+
 from search import (
     Problem,
     Node,
@@ -33,24 +36,40 @@ class TakuzuState:
 
 
 class Board:
+
     """Representação interna de um tabuleiro de Takuzu."""
+    def __init__(self,positions):
+        self.positions=positions
 
     def get_number(self, row: int, col: int) -> int:
         """Devolve o valor na respetiva posição do tabuleiro."""
         # TODO
-        pass
+        return self.positions[row][col]
 
     def adjacent_vertical_numbers(self, row: int, col: int) -> (int, int):
         """Devolve os valores imediatamente abaixo e acima,
         respectivamente."""
         # TODO
-        pass
+        size=len(self.positions);
+        if(row==0):
+            return (self.get_number(row+1,col),None)
+        elif(row==size-1):
+            return (None,self.get_number(row-1,col))
+        else:
+            return (self.get_number(row+1,col),self.get_number(row-1,col))
+
 
     def adjacent_horizontal_numbers(self, row: int, col: int) -> (int, int):
         """Devolve os valores imediatamente à esquerda e à direita,
         respectivamente."""
         # TODO
-        pass
+        size=len(self.positions);
+        if(col==0):
+            return (None,self.get_number(row,col+1))
+        elif(col==size-1):
+            return (self.get_number(row,col-1),None)
+        else:
+            return (self.get_number(row,col-1),self.get_number(row,col+1))
 
     @staticmethod
     def parse_instance_from_stdin():
@@ -63,8 +82,14 @@ class Board:
             > from sys import stdin
             > stdin.readline()
         """
-        # TODO
-        pass
+        positions=[]
+        size=sys.stdin.readline()
+        for i in range(int(size)):
+            line_str=sys.stdin.readline().split('\t')
+            line=[int(i) for i in line_str]
+            positions.append(line)
+        print(positions)
+        return Board(positions)
 
     # TODO: outros metodos da classe
 
@@ -110,4 +135,11 @@ if __name__ == "__main__":
     # Usar uma técnica de procura para resolver a instância,
     # Retirar a solução a partir do nó resultante,
     # Imprimir para o standard output no formato indicado.
-    pass
+    board=Board.parse_instance_from_stdin()
+    print("Initial:\n",board, sep="")
+    
+    print(board.adjacent_vertical_numbers(3,3))
+    print(board.adjacent_horizontal_numbers(3,3))
+
+    print(board.adjacent_vertical_numbers(1,1))
+    print(board.adjacent_horizontal_numbers(1,1))
