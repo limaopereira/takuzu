@@ -85,13 +85,18 @@ class Board:
         positions=[]
         size=sys.stdin.readline()
         for i in range(int(size)):
-            line_str=sys.stdin.readline().split('\t')
-            line=[int(i) for i in line_str]
+            line=sys.stdin.readline()[:-1].split('\t')
+            # line=[int(i) for i in line_str]
             positions.append(line)
-        print(positions)
         return Board(positions)
 
     # TODO: outros metodos da classe
+
+    def __str__(self) -> str:
+        board_str=''
+        for line in self.positions:
+            board_str+='\t'.join(line)+'\n'
+        return board_str
 
 
 class Takuzu(Problem):
