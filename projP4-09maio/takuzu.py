@@ -109,8 +109,8 @@ class Board:
         positions=[]
         size=int(sys.stdin.readline())
         for i in range(size):
-            line=sys.stdin.readline()[:-1].split('\t')
-            # line=[int(i) for i in line_str]
+            line_str=sys.stdin.readline()[:-1].split('\t')
+            line=[int(i) for i in line_str]
             positions.append(line)
         return Board(positions,size)
 
@@ -119,7 +119,8 @@ class Board:
     def __str__(self) -> str:
         board_str=''
         for line in self.positions:
-            board_str+='\t'.join(line)+'\n'
+            line_str=[str(i) for i in line]
+            board_str+='\t'.join(line_str)+'\n'
         return board_str
 
 
