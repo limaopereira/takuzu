@@ -50,11 +50,14 @@ class Board:
     def set_number(self,row,col,number):
         self.positions[row][col]=number
 
-    def get_row(self,row):
-        return self.positions[row]
-    
-    def get_column(self, col):
-        return [line[col] for line in self.positions ]
+    def get_columns(self):
+        columns=[]
+        for col in range(self.size):
+            column=[]
+            for row in range(self.size):
+                column.append(self.positions[row][col])
+            columns.append(column)
+        return columns
 
     def adjacent_vertical_numbers(self, row: int, col: int) -> (int, int):
         """Devolve os valores imediatamente abaixo e acima,
@@ -90,13 +93,48 @@ class Board:
             positions_copy.append(copy_row)
         return Board(positions_copy,self.size)
 
+    def all_lines_different(self):
+        for i in range(0,self.size):
+            if(self.positions[i] in self.positions[i+1:]):
+                return False
+        return True
+
+    def all_columns_different(self):
+        columns=self.get_columns()
+        for i in range(0,self.size):
+            if(columns[i] in columns[i+1:]):
+                return False
+        return True
+
+    def has_more_than_two_equal_adjacent(self):
+        for row in range(self.size):
+            for col in range(self.size):
+                number=self.get_number(row,col)
+                adj_ver=self.adjacent_vertical_numbers(row,col)
+                adj_hor=self.adjacent_horizontal_numbers(row,col)
+                if((number==adj_ver[0] and number==adj_ver[1]) or (number==adj_hor[0] and number==adj_hor[1]) or number==2):
+                    return True
+        return False
+    
+    def has_equal_number_elements_lines(self):
+        for row in self.positions:
+            if(abs(row.count(0)-row.count(1))>1):
+                return False
+        return True
+
+    def has_equal_number_elements_columns(self):
+        columns=self.get_columns()
+        for column in columns:
+            if(abs(columns.count(0)-columns.count(1))>1):
+                return False
+        return True
+
+
+
 
     def get_size(self):
         return self.size
     
-    def get_positions(self):
-        new_positions=self.positions[:]
-        return new_positions
 
     @staticmethod
     def parse_instance_from_stdin():
@@ -131,7 +169,7 @@ class Takuzu(Problem):
     def __init__(self, board: Board):
         """O construtor especifica o estado inicial."""
         # TODO
-        self.board=board
+        self.initial=TakuzuState(board)
 
     def actions(self, state: TakuzuState):
         """Retorna uma lista de ações que podem ser executadas a
@@ -162,20 +200,13 @@ class Takuzu(Problem):
         um estado objetivo. Deve verificar se todas as posições do tabuleiro
         estão preenchidas com uma sequência de números adjacentes."""
         # TODO
-        size=state.board.get_size()
-        for row in range(size):
-            for col in range(size):
-                number=state.board.get_number(row,col)
-                adj_ver=state.board.adjacent_vertical_numbers(row,col)
-                adj_hor=state.board.adjacent_horizontal_numbers(row,col)
-                if((number==adj_ver[0] and number==adj_ver[1]) or (number==adj_hor[0] and number==adj_hor[1]) or number=='2'):
-                    return False
-
-        for i in range(size):
-            for j in range(i+1,size):
-                if((state.board.get_row(i)==state.board.get_row(j)) or (state.board.get_column(i)==state.board.get_column(j))):
-                    return False
-        return True
+        if(not state.board.has_more_than_two_equal_adjacent() and 
+        state.board.all_lines_different() and 
+        state.board.all_columns_different() and
+        state.board.has_equal_number_elements_lines() and
+        state.board.has_equal_number_elements_columns()):
+            return True
+        return False
 
                 
 
@@ -194,9 +225,10 @@ if __name__ == "__main__":
     # Retirar a solução a partir do nó resultante,
     # Imprimir para o standard output no formato indicado.
     board = Board.parse_instance_from_stdin()
-    print("Initial:\n", board, sep="")
     # Criar uma instância de Takuzu:
     problem = Takuzu(board)
-    # Criar um estado com a configuração inicial:
-    initial_state = TakuzuState(board)
-    
+    # Obter o nó solução usando a procura em profundidade:
+    goal_node = depth_first_tree_search(problem)
+    # Verificar se foi atingida a solução
+    print("Is goal?", problem.goal_test(goal_node.state))
+    print("Solution:\n", goal_node.state.board, sep="")
