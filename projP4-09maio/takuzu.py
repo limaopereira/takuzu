@@ -141,9 +141,9 @@ class Takuzu(Problem):
         size=state.board.get_size()
         for row in range(size):
             for col in range(size):
-                if state.board.get_number(row,col)=='2':
-                    actions.append((row,col,'0'))
-                    actions.append((row,col,'1'))
+                if state.board.get_number(row,col)==2:
+                    actions.append((row,col,0))
+                    actions.append((row,col,1))
         return actions
 
     def result(self, state: TakuzuState, action):
@@ -152,6 +152,10 @@ class Takuzu(Problem):
         das presentes na lista obtida pela execução de
         self.actions(state)."""
         # TODO
+        board_copy=state.board.copy()
+        board_copy.set_number(action[0],action[1],action[2])
+        return TakuzuState(board_copy)
+
 
     def goal_test(self, state: TakuzuState):
         """Retorna True se e só se o estado passado como argumento é
