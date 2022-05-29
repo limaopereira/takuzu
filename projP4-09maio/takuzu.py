@@ -129,9 +129,6 @@ class Board:
                 return False
         return True
 
-
-
-
     def get_size(self):
         return self.size
     
@@ -179,9 +176,14 @@ class Takuzu(Problem):
         size=state.board.get_size()
         for row in range(size):
             for col in range(size):
-                if state.board.get_number(row,col)==2:
+                number=state.board.get_number(row,col)
+                if number==2:
                     actions.append((row,col,0))
                     actions.append((row,col,1))
+                    break
+            if(len(actions)!=0):
+                break
+                            
         return actions
 
     def result(self, state: TakuzuState, action):
