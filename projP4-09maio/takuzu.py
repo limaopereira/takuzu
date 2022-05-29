@@ -47,6 +47,9 @@ class Board:
         # TODO
         return self.positions[row][col]
 
+    def set_number(self,row,col,number):
+        self.positions[row][col]=number
+
     def get_row(self,row):
         return self.positions[row]
     
