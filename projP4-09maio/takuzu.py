@@ -6,9 +6,8 @@
 # 00000 Nome1
 # 00000 Nome2
 
-import string
+
 import sys
-import numpy
 
 
 from search import (
@@ -79,6 +78,16 @@ class Board:
         else:
             return (self.get_number(row,col-1),self.get_number(row,col+1))
     
+    def copy(self):
+        positions_copy=[]
+        for row in self.positions:
+            copy_row=[]
+            for col in row:
+                copy_row.append(col) 
+            positions_copy.append(copy_row)
+        return Board(positions_copy,self.size)
+
+
     def get_size(self):
         return self.size
     
