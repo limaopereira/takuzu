@@ -9,6 +9,8 @@
 
 import sys
 
+from numpy import size
+
 
 from search import (
     Problem,
@@ -58,18 +60,56 @@ class Board:
                 column.append(self.positions[row][col])
             columns.append(column)
         return columns
+    
+    def adjacent_vertical_up(self,row,col):
+        if row==1:
+            return (None,self.get_number(row-1,col))
+        elif row>1:
+            return (self.get_number(row-2,col),self.get_number(row-1,col))
+        else:
+            return (None,None)
+    
+    def adjacent_vertical_down(self,row,col):
+        size=self.size
+        if row==size-2:
+            return (self.get_number(row+1,col),None)
+        elif row<size-2:
+            return(self.get_number(row+1,col),self.get_number(row+2,col))
+        else:
+            return (None,None)
+    
+        
 
     def adjacent_vertical_numbers(self, row: int, col: int) -> (int, int):
         """Devolve os valores imediatamente abaixo e acima,
         respectivamente."""
         # TODO
-        size=len(self.positions);
+        size=self.size
         if(row==0):
             return (self.get_number(row+1,col),None)
         elif(row==size-1):
             return (None,self.get_number(row-1,col))
         else:
             return (self.get_number(row+1,col),self.get_number(row-1,col))
+
+
+    def adjacent_horizontal_left(self,row,col):
+        if col==1:
+            return (None,self.get_number(row,col-1))
+        elif col>1:
+            return (self.get_number(row,col-2),self.get_number(row,col-1))
+        else:
+            return (None,None)
+        
+    def adjacent_horizontal_right(self,row,col):
+        size=self.size
+        if col==size-2:
+            return (self.get_number(row,col+1),None)
+        elif col<size-2:
+            return (self.get_number(row,col+1),self.get_number(row,col+2))
+        else:
+            return (None,None)
+
 
 
     def adjacent_horizontal_numbers(self, row: int, col: int) -> (int, int):
@@ -125,7 +165,7 @@ class Board:
     def has_equal_number_elements_columns(self):
         columns=self.get_columns()
         for column in columns:
-            if(abs(columns.count(0)-columns.count(1))>1):
+            if(abs(column.count(0)-column.count(1))>1):
                 return False
         return True
 
@@ -178,8 +218,19 @@ class Takuzu(Problem):
             for col in range(size):
                 number=state.board.get_number(row,col)
                 if number==2:
-                    actions.append((row,col,0))
-                    actions.append((row,col,1))
+                    adj_ver=state.board.adjacent_vertical_numbers(row,col)
+                    adj_hor=state.board.adjacent_horizontal_numbers(row,col)
+                    adj_ver_u=state.board.adjacent_vertical_up(row,col)
+                    adj_ver_d=state.board.adjacent_vertical_down(row,col)
+                    adj_hor_l=state.board.adjacent_horizontal_left(row,col)
+                    adj_hor_r=state.board.adjacent_horizontal_right(row,col)
+                    if adj_ver[0]==adj_ver[1]==0 or adj_hor[0]==adj_hor[1]==0 or adj_ver_u[0]==adj_ver_u[1]==0 or adj_ver_d[0]==adj_ver_d[1]==0 or adj_hor_l[0]==adj_hor_l[1]==0 or adj_hor_r[0]==adj_hor_r[1]==0:
+                        actions.append((row,col,1))
+                    elif adj_ver[0]==adj_ver[1]==1 or adj_hor[0]==adj_hor[1]==1 or adj_ver_u[0]==adj_ver_u[1]==1 or adj_ver_d[0]==adj_ver_d[1]==1 or adj_hor_l[0]==adj_hor_l[1]==1 or adj_hor_r[0]==adj_hor_r[1]==1:
+                        actions.append((row,col,0))
+                    else:
+                        actions.append((row,col,0))
+                        actions.append((row,col,1))
                     break
             if(len(actions)!=0):
                 break
@@ -229,6 +280,7 @@ if __name__ == "__main__":
     board = Board.parse_instance_from_stdin()
     # Criar uma instância de Takuzu:
     problem = Takuzu(board)
+    
     # Obter o nó solução usando a procura em profundidade:
     goal_node = depth_first_tree_search(problem)
     # Verificar se foi atingida a solução
