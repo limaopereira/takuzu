@@ -51,6 +51,12 @@ class Board:
 
     def set_number(self,row,col,number):
         self.positions[row][col]=number
+    
+    def get_column(self,col):
+        column=[]
+        for row in self.positions:
+            column.append(row[col])
+        return column
 
     def get_columns(self):
         columns=[]
@@ -169,6 +175,13 @@ class Board:
                 return False
         return True
 
+    def number_of_elements_row(self,row,value):
+        return self.positions[row].count(value)
+    
+    def number_of_elements_column(self,col,value):
+        return self.get_column(col).count(value)
+        
+
     def get_size(self):
         return self.size
     
@@ -218,6 +231,10 @@ class Takuzu(Problem):
             for col in range(size):
                 number=state.board.get_number(row,col)
                 if number==2:
+                    num_el_1_row=state.board.number_of_elements_row(row,1)
+                    num_el_0_row=state.board.number_of_elements_row(row,0)
+                    num_el_1_col=state.board.number_of_elements_column(col,1)
+                    num_el_0_col=state.board.number_of_elements_column(col,0)
                     adj_ver=state.board.adjacent_vertical_numbers(row,col)
                     adj_hor=state.board.adjacent_horizontal_numbers(row,col)
                     adj_ver_u=state.board.adjacent_vertical_up(row,col)
@@ -228,7 +245,11 @@ class Takuzu(Problem):
                         actions.append((row,col,1))
                     elif adj_ver[0]==adj_ver[1]==1 or adj_hor[0]==adj_hor[1]==1 or adj_ver_u[0]==adj_ver_u[1]==1 or adj_ver_d[0]==adj_ver_d[1]==1 or adj_hor_l[0]==adj_hor_l[1]==1 or adj_hor_r[0]==adj_hor_r[1]==1:
                         actions.append((row,col,0))
-                    else:
+                    elif (num_el_1_row==size/2 or num_el_1_col==size/2) and size%2==0:
+                        actions.append((row,col,0))
+                    elif (num_el_0_row==size/2 or num_el_0_col==size/2) and size%2==0:
+                        actions.append((row,col,1))
+                    elif (num_el_0_row<=size/2 or num_el_1_row<=size/2 or num_el_0_col<=size/2 or num_el_1_col<=size/2 ):
                         actions.append((row,col,0))
                         actions.append((row,col,1))
                     break
@@ -271,6 +292,47 @@ class Takuzu(Problem):
     # TODO: outros metodos da classe
 
 
+class CSP(Problem):
+    def __init__(self,board):
+        self.problem=board
+    
+    def constraint_propagation(self):
+        board=self.problem
+        size=board.get_size()
+        
+        initial_positions=[]
+        while initial_positions!=board.positions:
+            initial_positions=board.copy().positions
+            for row in range(size):
+                for col in range(size):
+                    if(board.get_number(row,col)==2):
+                        num_el_1_row=board.number_of_elements_row(row,1)
+                        num_el_0_row=board.number_of_elements_row(row,0)
+                        num_el_1_col=board.number_of_elements_column(col,1)
+                        num_el_0_col=board.number_of_elements_column(col,0)
+                        adj_ver=board.adjacent_vertical_numbers(row,col)
+                        adj_hor=board.adjacent_horizontal_numbers(row,col)
+                        adj_ver_u=board.adjacent_vertical_up(row,col)
+                        adj_ver_d=board.adjacent_vertical_down(row,col)
+                        adj_hor_l=board.adjacent_horizontal_left(row,col)
+                        adj_hor_r=board.adjacent_horizontal_right(row,col)
+                        if adj_ver[0]==adj_ver[1]==0 or adj_hor[0]==adj_hor[1]==0 or adj_ver_u[0]==adj_ver_u[1]==0 or adj_ver_d[0]==adj_ver_d[1]==0 or adj_hor_l[0]==adj_hor_l[1]==0 or adj_hor_r[0]==adj_hor_r[1]==0:
+                            board.set_number(row,col,1)
+                            #print("R1")
+                        elif adj_ver[0]==adj_ver[1]==1 or adj_hor[0]==adj_hor[1]==1 or adj_ver_u[0]==adj_ver_u[1]==1 or adj_ver_d[0]==adj_ver_d[1]==1 or adj_hor_l[0]==adj_hor_l[1]==1 or adj_hor_r[0]==adj_hor_r[1]==1:
+                            board.set_number(row,col,0)
+                            #print("R2")
+                        elif (num_el_1_row==size/2 or num_el_1_col==size/2) and size%2==0:
+                            board.set_number(row,col,0)
+                            #print("R3")
+                        elif (num_el_0_row==size/2 or num_el_0_col==size/2) and size%2==0:
+                            board.set_number(row,col,1)
+                            #print("R4")
+                        
+    
+        
+
+
 if __name__ == "__main__":
     # TODO:
     # Ler o ficheiro do standard input,
@@ -279,10 +341,21 @@ if __name__ == "__main__":
     # Imprimir para o standard output no formato indicado.
     board = Board.parse_instance_from_stdin()
     # Criar uma instância de Takuzu:
-    problem = Takuzu(board)
+    
+    
+    csp=CSP(board)
+    
+    csp.constraint_propagation()
+    
+    #print(csp.problem)
+    
+    problem = Takuzu(csp.problem)
     
     # Obter o nó solução usando a procura em profundidade:
+    
     goal_node = depth_first_tree_search(problem)
+    
     # Verificar se foi atingida a solução
+    
     print("Is goal?", problem.goal_test(goal_node.state))
     print("Solution:\n", goal_node.state.board, sep="")
