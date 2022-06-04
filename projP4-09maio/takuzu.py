@@ -67,6 +67,14 @@ class Board:
             columns.append(column)
         return columns
     
+    def get_empty_positions(self):
+        empty=[]
+        for row in self.positions:
+            for col in row:
+                if self.get_number(row,col)==2:
+                    empty.append((row,col))
+        return empty
+    
     def adjacent_vertical_up(self,row,col):
         if row==1:
             return (None,self.get_number(row-1,col))
@@ -212,7 +220,7 @@ class Board:
         for line in self.positions:
             line_str=[str(i) for i in line]
             board_str+='\t'.join(line_str)+'\n'
-        return board_str
+        return board_str[:-1]
 
 
 class Takuzu(Problem):
@@ -347,15 +355,17 @@ if __name__ == "__main__":
     
     csp.constraint_propagation()
     
-    #print(csp.problem)
+    print(csp.problem)
     
     problem = Takuzu(csp.problem)
     
     # Obter o nó solução usando a procura em profundidade:
     
-    goal_node = depth_first_tree_search(problem)
+    #goal_node = depth_first_tree_search(problem)
     
     # Verificar se foi atingida a solução
     
-    print("Is goal?", problem.goal_test(goal_node.state))
-    print("Solution:\n", goal_node.state.board, sep="")
+    #print("Is goal?", problem.goal_test(goal_node.state))
+    #print("Solution:\n", goal_node.state.board, sep="")
+    
+    #print(goal_node.state.board, sep="")
