@@ -314,6 +314,8 @@ class CSP(Problem):
             remove=[]
             for i in range(len(empty)):
                 row,col=empty[i]
+            #for row in range(size):
+                #for col in range(size):
                 num_el_1_row=board.number_of_elements_row(row,1)
                 num_el_0_row=board.number_of_elements_row(row,0)
                 num_el_1_col=board.number_of_elements_column(col,1)
@@ -340,13 +342,19 @@ class CSP(Problem):
                     board.set_number(row,col,1)
                     remove.append(i)
                     #print("R4")
+                elif (num_el_1_row==size//2+1 or num_el_1_col==size//2+1) and size%2==1:
+                    board.set_number(row,col,0)
+                    remove.append(i)
+                elif (num_el_0_row==size//2+1 or num_el_0_col==size//2+1) and size%2==1:
+                    board.set_number(row,col,1)
+                    remove.append(i)
             count=0
             for i in remove:
                 empty.pop(i-count)
                 count+=1
                         
     
-        
+
 
 
 if __name__ == "__main__":
@@ -364,17 +372,17 @@ if __name__ == "__main__":
     
     csp.constraint_propagation()
     
-    print(csp.problem)
+    #print(csp.problem)
     
     problem = Takuzu(csp.problem)
     
     # Obter o nó solução usando a procura em profundidade:
     
-    #goal_node = depth_first_tree_search(problem)
+    goal_node = depth_first_tree_search(problem)
     
     # Verificar se foi atingida a solução
     
     #print("Is goal?", problem.goal_test(goal_node.state))
     #print("Solution:\n", goal_node.state.board, sep="")
     
-    #print(goal_node.state.board, sep="")
+    print(goal_node.state.board, sep="")
