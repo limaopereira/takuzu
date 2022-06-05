@@ -236,29 +236,33 @@ class Takuzu(Problem):
         actions=[]
         size=state.board.get_size()
         empty=state.board.get_empty_positions()
-        if len(empty)>0:
-            row,col=empty[0]    
-            num_el_1_row=state.board.number_of_elements_row(row,1)
-            num_el_0_row=state.board.number_of_elements_row(row,0)
-            num_el_1_col=state.board.number_of_elements_column(col,1)
-            num_el_0_col=state.board.number_of_elements_column(col,0)
-            adj_ver=state.board.adjacent_vertical_numbers(row,col)
-            adj_hor=state.board.adjacent_horizontal_numbers(row,col)
-            adj_ver_u=state.board.adjacent_vertical_up(row,col)
-            adj_ver_d=state.board.adjacent_vertical_down(row,col)
-            adj_hor_l=state.board.adjacent_horizontal_left(row,col)
-            adj_hor_r=state.board.adjacent_horizontal_right(row,col)
-            if adj_ver[0]==adj_ver[1]==0 or adj_hor[0]==adj_hor[1]==0 or adj_ver_u[0]==adj_ver_u[1]==0 or adj_ver_d[0]==adj_ver_d[1]==0 or adj_hor_l[0]==adj_hor_l[1]==0 or adj_hor_r[0]==adj_hor_r[1]==0:
-                actions.append((row,col,1))
-            elif adj_ver[0]==adj_ver[1]==1 or adj_hor[0]==adj_hor[1]==1 or adj_ver_u[0]==adj_ver_u[1]==1 or adj_ver_d[0]==adj_ver_d[1]==1 or adj_hor_l[0]==adj_hor_l[1]==1 or adj_hor_r[0]==adj_hor_r[1]==1:
-                actions.append((row,col,0))
-            elif (num_el_1_row==size/2 or num_el_1_col==size/2) and size%2==0:
-                actions.append((row,col,0))
-            elif (num_el_0_row==size/2 or num_el_0_col==size/2) and size%2==0:
-                actions.append((row,col,1))
-            elif (num_el_0_row<=size/2 or num_el_1_row<=size/2 or num_el_0_col<=size/2 or num_el_1_col<=size/2 ):
-                actions.append((row,col,0))
-                actions.append((row,col,1))
+        if(len(empty)>0):
+            row,col=empty[0]
+            actions.append((row,col,0))
+            actions.append((row,col,1))
+        # if len(empty)>0:
+        #     row,col=empty[0]    
+        #     num_el_1_row=state.board.number_of_elements_row(row,1)
+        #     num_el_0_row=state.board.number_of_elements_row(row,0)
+        #     num_el_1_col=state.board.number_of_elements_column(col,1)
+        #     num_el_0_col=state.board.number_of_elements_column(col,0)
+        #     adj_ver=state.board.adjacent_vertical_numbers(row,col)
+        #     adj_hor=state.board.adjacent_horizontal_numbers(row,col)
+        #     adj_ver_u=state.board.adjacent_vertical_up(row,col)
+        #     adj_ver_d=state.board.adjacent_vertical_down(row,col)
+        #     adj_hor_l=state.board.adjacent_horizontal_left(row,col)
+        #     adj_hor_r=state.board.adjacent_horizontal_right(row,col)
+        #     if adj_ver[0]==adj_ver[1]==0 or adj_hor[0]==adj_hor[1]==0 or adj_ver_u[0]==adj_ver_u[1]==0 or adj_ver_d[0]==adj_ver_d[1]==0 or adj_hor_l[0]==adj_hor_l[1]==0 or adj_hor_r[0]==adj_hor_r[1]==0:
+        #         actions.append((row,col,1))
+        #     elif adj_ver[0]==adj_ver[1]==1 or adj_hor[0]==adj_hor[1]==1 or adj_ver_u[0]==adj_ver_u[1]==1 or adj_ver_d[0]==adj_ver_d[1]==1 or adj_hor_l[0]==adj_hor_l[1]==1 or adj_hor_r[0]==adj_hor_r[1]==1:
+        #         actions.append((row,col,0))
+        #     elif (num_el_1_row==size/2 or num_el_1_col==size/2) and size%2==0:
+        #         actions.append((row,col,0))
+        #     elif (num_el_0_row==size/2 or num_el_0_col==size/2) and size%2==0:
+        #         actions.append((row,col,1))
+        #     elif (num_el_0_row<=size/2 or num_el_1_row<=size/2 or num_el_0_col<=size/2 or num_el_1_col<=size/2 ):
+        #         actions.append((row,col,0))
+        #         actions.append((row,col,1))
         return actions
 
     def result(self, state: TakuzuState, action):
@@ -267,9 +271,14 @@ class Takuzu(Problem):
         das presentes na lista obtida pela execução de
         self.actions(state)."""
         # TODO
+        
         board_copy=state.board.copy()
         board_copy.set_number(action[0],action[1],action[2])
-        return TakuzuState(board_copy)
+        csp=CSP(board_copy)
+        csp.constraint_propagation()
+        #board_copy=csp.problem.copy()
+        
+        return TakuzuState(csp.problem)
 
 
     def goal_test(self, state: TakuzuState):
@@ -307,7 +316,6 @@ class CSP(Problem):
         while initial_positions!=board.positions:
             empty=board.get_empty_positions()
             initial_positions=board.copy().positions
-            remove=[]
             for i in range(len(empty)):
                 row,col=empty[i]
             #for row in range(size):
