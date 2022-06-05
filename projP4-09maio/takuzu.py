@@ -369,40 +369,40 @@ class CSP(Problem):
                     #print("R6",row,col)
                     #print(board)
                     #remove.append(i)
-                elif (num_el_1_row==size//2-1 and size%2==0) and ((adj_hor[0]==0 and adj_hor[1]==2) or (adj_hor[0]==2 and adj_hor[1]==0)):
-                    #print("0 row",empty[i])
-                    #print(board)
-                    for (row_2,col_2) in empty:
-                        if abs(col_2-col)>1 and row==row_2 and board.get_number(row_2,col_2)==2:
-                            board.set_number(row_2,col_2,0)
-                            #print(row_2,col_2)
-                    #     if row==row_2 and abs(col_2-col)>1:
-                    #         board.set_number(row,col_2,0)
-                    #break
-                elif (num_el_0_row==size//2-1 and size%2==0) and ((adj_hor[0]==1 and adj_hor[1]==2) or (adj_hor[0]==2 and adj_hor[1]==1)):
-                    #print("1 row",empty[i])
-                    #print(board)
-                    for (row_2,col_2) in empty:
-                        if row==row_2 and abs(col_2-col)>1 and board.get_number(row_2,col_2)==2:
-                            board.set_number(row,col_2,1)
-                            #print(row_2,col_2)
-                    #         break
-                    #break
-                elif (num_el_1_col==size//2-1 and size%2==0) and ((adj_ver[0]==0 and adj_ver[1]==2) or (adj_ver[0]==2 and adj_ver[1]==0)):
-                    #print("0 col",empty[i])
-                    #print(board)
-                    for (row_2,col_2) in empty:
-                        if col==col_2 and abs(row_2-row)>1 and board.get_number(row_2,col_2)==2:
-                            board.set_number(row_2,col,0)
-                            #print(row_2,col_2)
-                    #break
-                elif (num_el_0_col==size//2-1 and size%2==0) and ((adj_ver[0]==1 and adj_ver[1]==2) or (adj_ver[0]==2 and adj_ver[1]==1)):
-                    #print("1 col",empty[i])
-                    #print(board)
-                    for (row_2,col_2) in empty:
-                        if col==col_2 and abs(row_2-row)>1 and board.get_number(row_2,col_2)==2:
-                            board.set_number(row_2,col,1)
-                            #print(row_2,col_2)
+                # elif (num_el_1_row==size//2-1 and size%2==0) and ((adj_hor[0]==0 and adj_hor[1]==2) or (adj_hor[0]==2 and adj_hor[1]==0)):
+                #     #print("0 row",empty[i])
+                #     #print(board)
+                #     for (row_2,col_2) in empty:
+                #         if abs(col_2-col)>1 and row==row_2 and board.get_number(row_2,col_2)==2:
+                #             board.set_number(row_2,col_2,0)
+                #             #print(row_2,col_2)
+                #     #     if row==row_2 and abs(col_2-col)>1:
+                #     #         board.set_number(row,col_2,0)
+                #     #break
+                # elif (num_el_0_row==size//2-1 and size%2==0) and ((adj_hor[0]==1 and adj_hor[1]==2) or (adj_hor[0]==2 and adj_hor[1]==1)):
+                #     #print("1 row",empty[i])
+                #     #print(board)
+                #     for (row_2,col_2) in empty:
+                #         if row==row_2 and abs(col_2-col)>1 and board.get_number(row_2,col_2)==2:
+                #             board.set_number(row,col_2,1)
+                #             #print(row_2,col_2)
+                #     #         break
+                #     #break
+                # elif (num_el_1_col==size//2-1 and size%2==0) and ((adj_ver[0]==0 and adj_ver[1]==2) or (adj_ver[0]==2 and adj_ver[1]==0)):
+                #     #print("0 col",empty[i])
+                #     #print(board)
+                #     for (row_2,col_2) in empty:
+                #         if col==col_2 and abs(row_2-row)>1 and board.get_number(row_2,col_2)==2:
+                #             board.set_number(row_2,col,0)
+                #             #print(row_2,col_2)
+                #     #break
+                # elif (num_el_0_col==size//2-1 and size%2==0) and ((adj_ver[0]==1 and adj_ver[1]==2) or (adj_ver[0]==2 and adj_ver[1]==1)):
+                #     #print("1 col",empty[i])
+                #     #print(board)
+                #     for (row_2,col_2) in empty:
+                #         if col==col_2 and abs(row_2-row)>1 and board.get_number(row_2,col_2)==2:
+                #             board.set_number(row_2,col,1)
+                #             #print(row_2,col_2)
                     #break
                     
             # count=0
