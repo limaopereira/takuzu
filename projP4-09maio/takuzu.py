@@ -2,9 +2,9 @@
 # Devem alterar as classes e funções neste ficheiro de acordo com as instruções do enunciado.
 # Além das funções e classes já definidas, podem acrescentar outras que considerem pertinentes.
 
-# Grupo 00:
-# 00000 Nome1
-# 00000 Nome2
+# Grupo 99:
+# 98580 Manuel Pereira
+# 99334 Tiago Ferreira
 
 
 import sys
@@ -189,6 +189,12 @@ class Board:
     def number_of_elements_column(self,col,value):
         return self.get_column(col).count(value)
         
+    def number_of_elements(self, value):
+        soma=0
+        for i in range(len(self.positions)):
+            soma+=self.number_of_elements_row(i,value)
+        return soma
+
 
     def get_size(self):
         return self.size
@@ -240,29 +246,6 @@ class Takuzu(Problem):
             row,col=empty[0]
             actions.append((row,col,0))
             actions.append((row,col,1))
-        # if len(empty)>0:
-        #     row,col=empty[0]    
-        #     num_el_1_row=state.board.number_of_elements_row(row,1)
-        #     num_el_0_row=state.board.number_of_elements_row(row,0)
-        #     num_el_1_col=state.board.number_of_elements_column(col,1)
-        #     num_el_0_col=state.board.number_of_elements_column(col,0)
-        #     adj_ver=state.board.adjacent_vertical_numbers(row,col)
-        #     adj_hor=state.board.adjacent_horizontal_numbers(row,col)
-        #     adj_ver_u=state.board.adjacent_vertical_up(row,col)
-        #     adj_ver_d=state.board.adjacent_vertical_down(row,col)
-        #     adj_hor_l=state.board.adjacent_horizontal_left(row,col)
-        #     adj_hor_r=state.board.adjacent_horizontal_right(row,col)
-        #     if adj_ver[0]==adj_ver[1]==0 or adj_hor[0]==adj_hor[1]==0 or adj_ver_u[0]==adj_ver_u[1]==0 or adj_ver_d[0]==adj_ver_d[1]==0 or adj_hor_l[0]==adj_hor_l[1]==0 or adj_hor_r[0]==adj_hor_r[1]==0:
-        #         actions.append((row,col,1))
-        #     elif adj_ver[0]==adj_ver[1]==1 or adj_hor[0]==adj_hor[1]==1 or adj_ver_u[0]==adj_ver_u[1]==1 or adj_ver_d[0]==adj_ver_d[1]==1 or adj_hor_l[0]==adj_hor_l[1]==1 or adj_hor_r[0]==adj_hor_r[1]==1:
-        #         actions.append((row,col,0))
-        #     elif (num_el_1_row==size/2 or num_el_1_col==size/2) and size%2==0:
-        #         actions.append((row,col,0))
-        #     elif (num_el_0_row==size/2 or num_el_0_col==size/2) and size%2==0:
-        #         actions.append((row,col,1))
-        #     elif (num_el_0_row<=size/2 or num_el_1_row<=size/2 or num_el_0_col<=size/2 or num_el_1_col<=size/2 ):
-        #         actions.append((row,col,0))
-        #         actions.append((row,col,1))
         return actions
 
     def result(self, state: TakuzuState, action):
@@ -276,7 +259,6 @@ class Takuzu(Problem):
         board_copy.set_number(action[0],action[1],action[2])
         csp=CSP(board_copy)
         csp.constraint_propagation()
-        #board_copy=csp.problem.copy()
         
         return TakuzuState(csp.problem)
 
@@ -295,13 +277,46 @@ class Takuzu(Problem):
         return False
 
                 
-
     def h(self, node: Node):
         """Função heuristica utilizada para a procura A*."""
         # TODO
-        pass
+        
+        # para testar a astar nao vamos utilizar a constraint propagation
+        # vamos utilizar como heuristica o numero total de diferentes valores possiveis para cada celula
+        # ou seja a soma do numero de possibilidades das celulas vazias, tendo em conta as restrições
+        return self.number_possibilities(node)
 
-    # TODO: outros metodos da classe
+
+    def number_possibilities(self,node: Node):
+        board=node.state
+        empty=board.get_empty_positions()
+        possibilities=0
+        for i in range(len(empty)):
+            row,col=empty[i]
+            num_el_1_row=board.number_of_elements_row(row,1)
+            num_el_0_row=board.number_of_elements_row(row,0)
+            num_el_1_col=board.number_of_elements_column(col,1)
+            num_el_0_col=board.number_of_elements_column(col,0)
+            adj_ver=board.adjacent_vertical_numbers(row,col)
+            adj_hor=board.adjacent_horizontal_numbers(row,col)
+            adj_ver_u=board.adjacent_vertical_up(row,col)
+            adj_ver_d=board.adjacent_vertical_down(row,col)
+            adj_hor_l=board.adjacent_horizontal_left(row,col)
+            adj_hor_r=board.adjacent_horizontal_right(row,col)
+            if adj_ver[0]==adj_ver[1]==0 or adj_hor[0]==adj_hor[1]==0 or adj_ver_u[0]==adj_ver_u[1]==0 or adj_ver_d[0]==adj_ver_d[1]==0 or adj_hor_l[0]==adj_hor_l[1]==0 or adj_hor_r[0]==adj_hor_r[1]==0:
+                possibilities+=1
+            elif adj_ver[0]==adj_ver[1]==1 or adj_hor[0]==adj_hor[1]==1 or adj_ver_u[0]==adj_ver_u[1]==1 or adj_ver_d[0]==adj_ver_d[1]==1 or adj_hor_l[0]==adj_hor_l[1]==1 or adj_hor_r[0]==adj_hor_r[1]==1:
+                possibilities+=1
+            elif (num_el_1_row==size/2 or num_el_1_col==size/2) and size%2==0:
+                possibilities+=1
+            elif (num_el_0_row==size/2 or num_el_0_col==size/2) and size%2==0:
+                possibilities+=1
+            elif (num_el_1_row==size//2+1 or num_el_1_col==size//2+1) and size%2==1:
+                possibilities+=1
+            elif (num_el_0_row==size//2+1 or num_el_0_col==size//2+1) and size%2==1:
+                possibilities+=1
+            else:
+                possibilities+=2
 
 
 class CSP(Problem):
@@ -311,15 +326,12 @@ class CSP(Problem):
     def constraint_propagation(self):
         board=self.problem
         size=board.get_size()
-        #empty=board.get_empty_positions()
         initial_positions=[]
         while initial_positions!=board.positions:
             empty=board.get_empty_positions()
             initial_positions=board.copy().positions
             for i in range(len(empty)):
                 row,col=empty[i]
-            #for row in range(size):
-                #for col in range(size):
                 num_el_1_row=board.number_of_elements_row(row,1)
                 num_el_0_row=board.number_of_elements_row(row,0)
                 num_el_1_col=board.number_of_elements_column(col,1)
@@ -333,82 +345,27 @@ class CSP(Problem):
                 if adj_ver[0]==adj_ver[1]==0 or adj_hor[0]==adj_hor[1]==0 or adj_ver_u[0]==adj_ver_u[1]==0 or adj_ver_d[0]==adj_ver_d[1]==0 or adj_hor_l[0]==adj_hor_l[1]==0 or adj_hor_r[0]==adj_hor_r[1]==0:
                     if(board.get_number(row,col)==2):
                         board.set_number(row,col,1)
-                    #print("R1",row,col)
-                    #remove.append(i)
-                    #print("R1")
+
                 elif adj_ver[0]==adj_ver[1]==1 or adj_hor[0]==adj_hor[1]==1 or adj_ver_u[0]==adj_ver_u[1]==1 or adj_ver_d[0]==adj_ver_d[1]==1 or adj_hor_l[0]==adj_hor_l[1]==1 or adj_hor_r[0]==adj_hor_r[1]==1:
                     if(board.get_number(row,col)==2):
                         board.set_number(row,col,0)
-                    #print("R2",row,col)
-                    #print(board)
-                    #remove.append(i)
-                    #print("R2")
+
                 elif (num_el_1_row==size/2 or num_el_1_col==size/2) and size%2==0:
                     if(board.get_number(row,col)==2):
                         board.set_number(row,col,0)
-                    #print("R3",row,col)
-                    #print(board)
-                    #remove.append(i)
-                    #print("R3")
+
                 elif (num_el_0_row==size/2 or num_el_0_col==size/2) and size%2==0:
                     if(board.get_number(row,col)==2):
                         board.set_number(row,col,1)
-                    #print("R4",row,col)
-                    #print(board)
-                    #remove.append(i)
-                    #print("R4")
+
                 elif (num_el_1_row==size//2+1 or num_el_1_col==size//2+1) and size%2==1:
                     if(board.get_number(row,col)==2):
                         board.set_number(row,col,0)
-                    #print("R5",row,col)
-                    #print(board)
-                    #remove.append(i)
+                        
                 elif (num_el_0_row==size//2+1 or num_el_0_col==size//2+1) and size%2==1:
                     if(board.get_number(row,col)==2):
                         board.set_number(row,col,1)
-                    #print("R6",row,col)
-                    #print(board)
-                    #remove.append(i)
-                # elif (num_el_1_row==size//2-1 and size%2==0) and ((adj_hor[0]==0 and adj_hor[1]==2) or (adj_hor[0]==2 and adj_hor[1]==0)):
-                #     #print("0 row",empty[i])
-                #     #print(board)
-                #     for (row_2,col_2) in empty:
-                #         if abs(col_2-col)>1 and row==row_2 and board.get_number(row_2,col_2)==2:
-                #             board.set_number(row_2,col_2,0)
-                #             #print(row_2,col_2)
-                #     #     if row==row_2 and abs(col_2-col)>1:
-                #     #         board.set_number(row,col_2,0)
-                #     #break
-                # elif (num_el_0_row==size//2-1 and size%2==0) and ((adj_hor[0]==1 and adj_hor[1]==2) or (adj_hor[0]==2 and adj_hor[1]==1)):
-                #     #print("1 row",empty[i])
-                #     #print(board)
-                #     for (row_2,col_2) in empty:
-                #         if row==row_2 and abs(col_2-col)>1 and board.get_number(row_2,col_2)==2:
-                #             board.set_number(row,col_2,1)
-                #             #print(row_2,col_2)
-                #     #         break
-                #     #break
-                # elif (num_el_1_col==size//2-1 and size%2==0) and ((adj_ver[0]==0 and adj_ver[1]==2) or (adj_ver[0]==2 and adj_ver[1]==0)):
-                #     #print("0 col",empty[i])
-                #     #print(board)
-                #     for (row_2,col_2) in empty:
-                #         if col==col_2 and abs(row_2-row)>1 and board.get_number(row_2,col_2)==2:
-                #             board.set_number(row_2,col,0)
-                #             #print(row_2,col_2)
-                #     #break
-                # elif (num_el_0_col==size//2-1 and size%2==0) and ((adj_ver[0]==1 and adj_ver[1]==2) or (adj_ver[0]==2 and adj_ver[1]==1)):
-                #     #print("1 col",empty[i])
-                #     #print(board)
-                #     for (row_2,col_2) in empty:
-                #         if col==col_2 and abs(row_2-row)>1 and board.get_number(row_2,col_2)==2:
-                #             board.set_number(row_2,col,1)
-                #             #print(row_2,col_2)
-                    #break
                     
-            # count=0
-            # for i in remove:
-            #     empty.pop(i-count)
-            #     count+=1
                         
     
 
