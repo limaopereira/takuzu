@@ -410,6 +410,6 @@ if __name__ == "__main__":
     csp.constraint_propagation()
     
     problem = Takuzu(csp.problem)
-    goal_node=astar_search(problem)
+    goal_node=greedy_search(problem)
     
     print(goal_node.state.board, sep="")
