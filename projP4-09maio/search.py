@@ -205,7 +205,7 @@ def depth_first_tree_search(problem):
 
     frontier = [Node(problem.initial)]  # Stack
     count=0
-    while frontier and count<10:
+    while frontier:
         count+=1
         node = frontier.pop()
         #print(node.state.board)
@@ -273,8 +273,13 @@ def best_first_graph_search(problem, f, display=False):
     frontier = PriorityQueue('min', f)
     frontier.append(node)
     explored = set()
+    count=0
     while frontier:
         node = frontier.pop()
+        count+=1
+        #print(f(node))
+        #print(count)
+        #print(node.state.board)
         if problem.goal_test(node.state):
             if display:
                 print(len(explored), "paths have been expanded and", len(frontier), "paths remain in the frontier")

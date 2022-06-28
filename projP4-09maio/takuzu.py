@@ -9,8 +9,6 @@
 
 import sys
 
-from numpy import size
-
 
 from search import (
     Problem,
@@ -261,7 +259,7 @@ class Takuzu(Problem):
         csp.constraint_propagation()
         
         return TakuzuState(csp.problem)
-
+        #return TakuzuState(board_copy)
 
     def goal_test(self, state: TakuzuState):
         """Retorna True se e só se o estado passado como argumento é
@@ -280,15 +278,12 @@ class Takuzu(Problem):
     def h(self, node: Node):
         """Função heuristica utilizada para a procura A*."""
         # TODO
-        
-        # para testar a astar nao vamos utilizar a constraint propagation
-        # vamos utilizar como heuristica o numero total de diferentes valores possiveis para cada celula
-        # ou seja a soma do numero de possibilidades das celulas vazias, tendo em conta as restrições
-        return self.number_possibilities(node)
+        return max(self.number_possibilities(node),self.has_conflict(node))
 
 
     def number_possibilities(self,node: Node):
-        board=node.state
+        board=node.state.board
+        size=board.get_size()
         empty=board.get_empty_positions()
         possibilities=0
         for i in range(len(empty)):
@@ -317,6 +312,29 @@ class Takuzu(Problem):
                 possibilities+=1
             else:
                 possibilities+=2
+        return possibilities
+    
+    def has_conflict(self,node):
+        board=node.state.board
+        size=board.get_size()
+        for row in range(size):
+            for col in range(size):
+                number=board.get_number(row,col)
+                adj_ver=board.adjacent_vertical_numbers(row,col)
+                adj_hor=board.adjacent_horizontal_numbers(row,col)
+                if(number==adj_ver[0] and number==adj_ver[1] and number!=2) or (number==adj_hor[0] and number==adj_hor[1] and number!=2):
+                    return float("inf")
+        for i in range(size):
+            num_el_1_row=board.number_of_elements_row(i,1)
+            num_el_0_row=board.number_of_elements_row(i,0)
+            num_el_1_col=board.number_of_elements_column(i,1)
+            num_el_0_col=board.number_of_elements_column(i,0)
+            if (num_el_1_row>size/2 or num_el_1_col>size/2) and size%2==0:
+                return float("inf")
+            if (num_el_0_row>size/2 or num_el_0_col>size/2) and size%2==0:
+                return float("inf")
+            
+        return 0
 
 
 class CSP(Problem):
@@ -372,31 +390,13 @@ class CSP(Problem):
 
 
 if __name__ == "__main__":
-    # TODO:
-    # Ler o ficheiro do standard input,
-    # Usar uma técnica de procura para resolver a instância,
-    # Retirar a solução a partir do nó resultante,
-    # Imprimir para o standard output no formato indicado.
+    
     board = Board.parse_instance_from_stdin()
-    # Criar uma instância de Takuzu:
-    
-    
     
     csp=CSP(board)
-    
     csp.constraint_propagation()
     
-    #print(csp.problem)
-    
     problem = Takuzu(csp.problem)
-    
-    # Obter o nó solução usando a procura em profundidade:
-    
-    goal_node = depth_first_tree_search(problem)
-    
-    # Verificar se foi atingida a solução
-    
-    #print("Is goal?", problem.goal_test(goal_node.state))
-    #print("Solution:\n", goal_node.state.board, sep="")
+    goal_node=astar_search(problem)
     
     print(goal_node.state.board, sep="")
