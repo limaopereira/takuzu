@@ -48,15 +48,18 @@ class Board:
         return self.positions[row][col]
 
     def set_number(self,row,col,number):
+        """Marca uma posição com o valor number"""
         self.positions[row][col]=number
     
     def get_column(self,col):
+        """Devolve a coluna número col"""
         column=[]
         for row in self.positions:
             column.append(row[col])
         return column
 
     def get_columns(self):
+        """Devolve todas as colunas"""
         columns=[]
         for col in range(self.size):
             column=[]
@@ -66,6 +69,7 @@ class Board:
         return columns
     
     def get_empty_positions(self):
+        """Devolve todas as posições vazias"""
         empty=[]
         for row in range(self.size):
             for col in range(self.size):
@@ -74,6 +78,7 @@ class Board:
         return empty
     
     def adjacent_vertical_up(self,row,col):
+        """Devolve os primeiros dois valores das posições acima"""
         if row==1:
             return (None,self.get_number(row-1,col))
         elif row>1:
@@ -82,6 +87,7 @@ class Board:
             return (None,None)
     
     def adjacent_vertical_down(self,row,col):
+        """Devolve os primeiros dois valores das posições abaixo"""
         size=self.size
         if row==size-2:
             return (self.get_number(row+1,col),None)
@@ -106,6 +112,7 @@ class Board:
 
 
     def adjacent_horizontal_left(self,row,col):
+        """Devolve os primeiros dois valores à esquerda"""
         if col==1:
             return (None,self.get_number(row,col-1))
         elif col>1:
@@ -114,6 +121,7 @@ class Board:
             return (None,None)
         
     def adjacent_horizontal_right(self,row,col):
+        """Devolve os primeiros dois valores à direita""" 
         size=self.size
         if col==size-2:
             return (self.get_number(row,col+1),None)
@@ -137,6 +145,7 @@ class Board:
             return (self.get_number(row,col-1),self.get_number(row,col+1))
     
     def copy(self):
+        """Cria uma cópia do tabuleiro"""
         positions_copy=[]
         for row in self.positions:
             copy_row=[]
@@ -146,12 +155,14 @@ class Board:
         return Board(positions_copy,self.size)
 
     def all_lines_different(self):
+        """Verifica se todas as linhas são diferentes"""
         for i in range(0,self.size):
             if(self.positions[i] in self.positions[i+1:]):
                 return False
         return True
 
     def all_columns_different(self):
+        """Verifica se todas as colunas são diferentes"""
         columns=self.get_columns()
         for i in range(0,self.size):
             if(columns[i] in columns[i+1:]):
@@ -159,6 +170,7 @@ class Board:
         return True
 
     def has_more_than_two_equal_adjacent(self):
+        """Verifica se há 3 posições consecutivas com o mesmo número"""
         for row in range(self.size):
             for col in range(self.size):
                 number=self.get_number(row,col)
@@ -169,12 +181,14 @@ class Board:
         return False
     
     def has_equal_number_elements_lines(self):
+        """Verifica se existe o mesmo número de 0s e 1s em todas as linhas"""
         for row in self.positions:
             if(abs(row.count(0)-row.count(1))>1):
                 return False
         return True
 
     def has_equal_number_elements_columns(self):
+        """Verifica se existe o mesmo número de 0s e 1s em todas as colunas"""
         columns=self.get_columns()
         for column in columns:
             if(abs(column.count(0)-column.count(1))>1):
@@ -182,19 +196,15 @@ class Board:
         return True
 
     def number_of_elements_row(self,row,value):
+        """Devolve o número de posições com o valor value numa linha"""
         return self.positions[row].count(value)
     
     def number_of_elements_column(self,col,value):
+        """Devolve o número de posições com o valor value numa coluna"""
         return self.get_column(col).count(value)
         
-    def number_of_elements(self, value):
-        soma=0
-        for i in range(len(self.positions)):
-            soma+=self.number_of_elements_row(i,value)
-        return soma
-
-
     def get_size(self):
+        """Devolve tamanho do tabuleiro"""
         return self.size
     
 
@@ -220,6 +230,7 @@ class Board:
     # TODO: outros metodos da classe
 
     def __str__(self) -> str:
+        """Devolve a representação externa do tabuleiro"""
         board_str=''
         for line in self.positions:
             line_str=[str(i) for i in line]
@@ -259,7 +270,6 @@ class Takuzu(Problem):
         csp.constraint_propagation()
         
         return TakuzuState(csp.problem)
-        #return TakuzuState(board_copy)
 
     def goal_test(self, state: TakuzuState):
         """Retorna True se e só se o estado passado como argumento é
@@ -282,6 +292,7 @@ class Takuzu(Problem):
 
 
     def number_possibilities(self,node: Node):
+        """Primeira função utilizada para a heurística"""
         board=node.state.board
         size=board.get_size()
         empty=board.get_empty_positions()
@@ -315,6 +326,7 @@ class Takuzu(Problem):
         return possibilities
     
     def has_conflict(self,node):
+        """Segunda função utilizada para a heurística"""
         board=node.state.board
         size=board.get_size()
         for row in range(size):
@@ -342,6 +354,7 @@ class CSP(Problem):
         self.problem=board
     
     def constraint_propagation(self):
+        """Atualiza o tabuleiro de acordo com a propagação de restrições"""
         board=self.problem
         size=board.get_size()
         initial_positions=[]
